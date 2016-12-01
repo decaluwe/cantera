@@ -211,7 +211,7 @@ void RedlichKwongMFTP::getActivityConcentrations(doublereal* c) const
     //for (size_t k = 0; k < m_kk; k++) {
     //    c[k] = moleFraction(k) / m_partialMolarVolumes[k];
     //}
-    c = getConcentrations;
+    getConcentrations(c);
 }
 
 doublereal RedlichKwongMFTP::standardConcentration(size_t k) const
