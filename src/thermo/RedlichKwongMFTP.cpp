@@ -207,10 +207,12 @@ void RedlichKwongMFTP::compositionChanged()
 
 void RedlichKwongMFTP::getActivityConcentrations(doublereal* c) const
 {
-    getPartialMolarVolumes(m_partialMolarVolumes.data());
+    doublereal pratio = pressure()/refPressure();
+    //doublereal refP = refPressure();
+    //doublereal* a;
+    getActivityCoefficients(c);
     for (size_t k = 0; k < m_kk; k++) {
-        c[k] = moleFraction(k) / m_partialMolarVolumes[k];
-    }
+        c[k] *= refPressure()*moleFraction(k)*pratio/RT();}
 }
 
 doublereal RedlichKwongMFTP::standardConcentration(size_t k) const
@@ -419,6 +421,7 @@ void RedlichKwongMFTP::getPartialMolarVolumes(doublereal* vbar) const
     }
 
     doublereal sqt = sqrt(temperature());
+
     doublereal mv = molarVolume();
     doublereal vmb = mv - m_b_current;
     doublereal vpb = mv + m_b_current;
