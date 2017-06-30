@@ -270,7 +270,6 @@ ElectrochemicalReaction::ElectrochemicalReaction(const Composition& reactants_,
 {
 }
 
-
 Arrhenius readArrhenius(const XML_Node& arrhenius_node)
 {
     return Arrhenius(getFloat(arrhenius_node, "A", "toSI"),
