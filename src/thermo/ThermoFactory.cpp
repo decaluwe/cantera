@@ -23,7 +23,7 @@
 #include "cantera/thermo/IonsFromNeutralVPSSTP.h"
 #include "cantera/thermo/PureFluidPhase.h"
 #include "cantera/thermo/RedlichKwongMFTP.h"
-#include "cantera/thermo/PengRobinsonMFTP.h"
+#include "cantera/thermo/PengRobinson.h"
 #include "cantera/thermo/ConstDensityThermo.h"
 #include "cantera/thermo/SurfPhase.h"
 #include "cantera/thermo/EdgePhase.h"
@@ -89,8 +89,8 @@ ThermoFactory::ThermoFactory()
     reg("RedlichKwong", []() { return new RedlichKwongMFTP(); });
     m_synonyms["RedlichKwongMFTP"] = "RedlichKwong";
     m_synonyms["Redlich-Kwong"] = "RedlichKwong";
-    reg("PengRobinson", []() { return new PengRobinsonMFTP(); });
-    m_synonyms["PengRobinsonMFTP"] = "PengRobinson";
+    reg("PengRobinson", []() { return new PengRobinson(); });
+    m_synonyms["PengRobinson"] = "PengRobinson";
     m_synonyms["Peng-Robinson"] = "PengRobinson";
     reg("MaskellSolidSolnPhase", []() { return new MaskellSolidSolnPhase(); });
     m_synonyms["Maskell-solid-solution"] = "MaskellSolidSolnPhase";
