@@ -260,14 +260,14 @@ public:
     virtual void getStandardVolumes(doublereal* vol) const;
     // @}
 
-    //! Set the temperature of the phase
-    /*!
-     * Currently this passes down to setState_TP(). It does not make sense to
-     * calculate the standard state without first setting T and P.
-     *
-     * @param temp  Temperature (kelvin)
-     */
-    virtual void setTemperature(const doublereal temp);
+    // //! Set the temperature of the phase
+    // /*!
+    //  * Currently this passes down to setState_TP(). It does not make sense to
+    //  * calculate the standard state without first setting T and P.
+    //  *
+    //  * @param temp  Temperature (kelvin)
+    //  */
+    // virtual void setTemperature(const doublereal temp);
 
     //! Set the internally stored pressure (Pa) at constant temperature and
     //! composition
@@ -306,6 +306,7 @@ public:
     virtual void setState_TPX(doublereal t, doublereal p, const doublereal* x);
 
 protected:
+    virtual void setTemperature(const double temp);
     virtual void compositionChanged();
     void setMoleFractions_NoState(const doublereal* const x);
 
@@ -544,6 +545,14 @@ protected:
     virtual doublereal dpdVCalc(doublereal TKelvin, doublereal molarVol, doublereal& presCalc) const;
 
     virtual void updateMixingExpressions();
+
+    //! Update the a and b parameters
+    /*!
+     *  The a and the b parameters depend on the mole fraction and the
+     *  temperature. This function updates the internal numbers based on the
+     *  state of the object.
+     */
+    void updateAB();
 
 
     //! Solve the cubic equation of state

@@ -243,16 +243,17 @@ bool MixtureFugacityTP::addSpecies(shared_ptr<Species> spec)
     return added;
 }
 
-void MixtureFugacityTP::setTemperature(const doublereal temp)
-{
-    _updateReferenceStateThermo();
-    setState_TR(temperature(), density());
-}
-
 void MixtureFugacityTP::setPressure(doublereal p)
 {
     setState_TP(temperature(), p);
- }
+}
+
+ void MixtureFugacityTP::setTemperature(const doublereal temp)
+{
+    Phase::setTemperature(temp);
+    _updateReferenceStateThermo();
+    updateAB();
+}
 
 void MixtureFugacityTP::compositionChanged()
 {
@@ -535,6 +536,10 @@ doublereal MixtureFugacityTP::densityCalc(doublereal TKelvin, doublereal presPa,
         densBase = mmw / molarVolBase;
     }
     return densBase;
+}
+
+void MixtureFugacityTP::updateAB()
+{
 }
 
 void MixtureFugacityTP::updateMixingExpressions()

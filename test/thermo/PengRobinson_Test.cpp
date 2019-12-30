@@ -185,6 +185,8 @@ TEST_F(PengRobinson_Test, getPressure)
     double acc_factor = 0.228;
     double pres_theoretical, kappa, alpha, mv;
     const double rho = 1.0737; 
+
+    set_r(1.);        
     const double Tcrit = test_phase->critTemperature();
 
     //Calculate kappa value 
@@ -192,14 +194,13 @@ TEST_F(PengRobinson_Test, getPressure)
 
     for (int i = 0; i<10; i++)
     {
-        const double temp = 296 + i * 2;
-        set_r(0.999);        
-        test_phase->setState_TR(temp, 1.0737);
-        mv = 1 / rho * test_phase->meanMolecularWeight();
+        const double temp = 296 + i * 2.;
+        test_phase->setState_TR(temp, rho);
+        mv =  test_phase->meanMolecularWeight() / rho ;
         //Calculate pressure using Peng-Robinson EoS
-        alpha = pow(1 + kappa*(1 - sqrt(temp / Tcrit)), 2);
+        alpha = pow(1. + kappa*(1 - sqrt(temp / Tcrit)), 2.);
         pres_theoretical = GasConstant*temp / (mv - b_coeff) - a_coeff*alpha / (mv*mv + 2*b_coeff*mv - b_coeff*b_coeff);
-        EXPECT_NEAR(test_phase->pressure(), pres_theoretical, 2);
+        EXPECT_NEAR(test_phase->pressure(), pres_theoretical, 1.e-8);
     }
 }
 };

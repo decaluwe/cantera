@@ -104,7 +104,7 @@ public:
 
 protected:
 
-    virtual void setTemperature(const double temp);
+    // virtual void setTemperature(const double temp);
     virtual void compositionChanged();
 
 public:

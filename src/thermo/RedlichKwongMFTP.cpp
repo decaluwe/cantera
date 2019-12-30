@@ -166,13 +166,6 @@ doublereal RedlichKwongMFTP::pressure() const
     return pp;
 }
 
-void RedlichKwongMFTP::setTemperature(const doublereal temp)
-{
-    Phase::setTemperature(temp);
-    _updateReferenceStateThermo();
-    updateAB();
-}
-
 void RedlichKwongMFTP::compositionChanged()
 {
     MixtureFugacityTP::compositionChanged();

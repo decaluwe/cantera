@@ -176,12 +176,12 @@ double PengRobinson::pressure() const
     return pp;
 }
 
-void PengRobinson::setTemperature(const double temp)
-{
-    Phase::setTemperature(temp);
-    _updateReferenceStateThermo();
-    updateAB();
-}
+// void PengRobinson::setTemperature(const doublereal temp)
+// {
+//     Phase::setTemperature(temp);
+//     _updateReferenceStateThermo();
+//     updateAB();
+// }
 
 void PengRobinson::compositionChanged()
 {
@@ -918,12 +918,12 @@ void PengRobinson::updateAB()
     double temp = temperature();
     //Update aAlpha_i
     double sqt_alpha;
-    double criTemp = critTemperature();
-    double sqt_T_reduced = sqrt(temp / criTemp);
+    double critTemp = critTemperature();
+    double sqt_T_reduced = sqrt(temp / critTemp);
 
     // Update indiviual alpha
     for (size_t j = 0; j < m_kk; j++) {
-        sqt_alpha = 1 + kappa_vec_[j] * (1 - sqt_T_reduced);
+        sqt_alpha = 1. + kappa_vec_[j] * (1. - sqt_T_reduced);
         alpha_vec_Curr_[j] = sqt_alpha*sqt_alpha;
     }
 
@@ -932,7 +932,7 @@ void PengRobinson::updateAB()
         for (size_t j = 0; j < m_kk; j++) {
             size_t counter = i * m_kk + j;
             a_vec_Curr_[counter] = a_coeff_vec(0, counter);
-            aAlpha_vec_Curr_[counter] = sqrt(alpha_vec_Curr_[i] * alpha_vec_Curr_[j]) * a_coeff_vec(0, counter);
+            aAlpha_vec_Curr_[counter] = sqrt(alpha_vec_Curr_[i] * alpha_vec_Curr_[j]) * a_vec_Curr_[counter];
         }
     }
 
@@ -944,7 +944,7 @@ void PengRobinson::updateAB()
         m_b_current += moleFractions_[i] * b_vec_Curr_[i];
         for (size_t j = 0; j < m_kk; j++) {
             m_a_current += a_vec_Curr_[i * m_kk + j] * moleFractions_[i] * moleFractions_[j];
-                        m_aAlpha_current += aAlpha_vec_Curr_[i * m_kk + j] * moleFractions_[i] * moleFractions_[j];
+            m_aAlpha_current += aAlpha_vec_Curr_[i * m_kk + j] * moleFractions_[i] * moleFractions_[j];
         }
     }
 }
