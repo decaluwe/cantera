@@ -1218,14 +1218,14 @@ class TestReaction(utilities.CanteraTest):
 
 class TestButlerVolmer(utilities.CanteraTest):
 
-    def test_pressure_dependence(self):
+    def test_rate_pressure_dependence(self):
         infile = 'butler-volmer-test.yaml'
         
-        gas = ct.Solution(infile,'gas')
-        Pt = ct.Solution(infile,'metal')
-        Naf = ct.Solution(infile,'electrolyte')
-        tpb = ct.Interface(infile,'tpb',[gas,Pt,Naf])
-        phases = {gas,Pt,Naf,tpb}
+        gas = ct.Solution(infile, 'gas')
+        Pt = ct.Solution(infile, 'metal')
+        Naf = ct.Solution(infile, 'electrolyte')
+        tpb = ct.Interface(infile, 'tpb', [gas,Pt,Naf])
+        phases = {gas, Pt, Naf, tpb}
 
         TP1 = 300, ct.one_atm
         for ph in phases:

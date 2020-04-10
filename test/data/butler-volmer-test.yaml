@@ -27,7 +27,7 @@ phases:
   state:
     T: 300.
     P: 1.01325e+05
-    X: {H(elyte): 1.0, Vac(elyte): 1e-5}
+    X: {H(elyte): 9.9999e-1, Vac(elyte): 1e-5}
 - name: tpb
   thermo: edge
   elements: [H]

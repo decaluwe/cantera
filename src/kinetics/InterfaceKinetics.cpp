@@ -183,6 +183,7 @@ void InterfaceKinetics::updateExchangeCurrentQuantities()
     // Calculate:
     //   - m_StandardConc[]
     //   - m_ProdStanConcReac[]
+    //   - m_ProdStanConcProd[]
     //   - m_deltaG0[]
     //   - m_mu0[]
 
@@ -203,11 +204,13 @@ void InterfaceKinetics::updateExchangeCurrentQuantities()
 
     getReactionDelta(m_mu0.data(), m_deltaG0.data());
 
-    //  Calculate the product of the standard concentrations of the reactants
+    //  Calculate the product of the standard concentrations of the reactants and products
     for (size_t i = 0; i < nReactions(); i++) {
         m_ProdStanConcReac[i] = 1.0;
+        m_ProdStanConcRevProd[i] = 1.0;
     }
     m_reactantStoich.multiply(m_StandardConc.data(), m_ProdStanConcReac.data());
+    m_revProductStoich.multiply(m_StandardConc.data(), m_ProdStanConcRevProd.data());
 }
 
 void InterfaceKinetics::applyVoltageKfwdCorrection(doublereal* const kf)
@@ -269,7 +272,8 @@ void InterfaceKinetics::convertExchangeCurrentDensityFormulation(doublereal* con
                 //  Calculate the term and modify the forward reaction
                 double tmp = exp(- m_beta[i] * m_deltaG0[irxn]
                                  / thermo(reactionPhaseIndex()).RT());
-                tmp *= 1.0 / pow(m_ProdStanConcReac[irxn],m_beta[i]) / Faraday;
+                tmp *= 1.0 / pow(m_ProdStanConcReac[irxn],m_beta[i]) / 
+                        pow(m_ProdStanConcRevProd[irxn],-m_beta[i]) / Faraday;
                 kfwd[irxn] *= tmp;
             }
             //  If BVform is nonzero we don't need to do anything.
@@ -285,7 +289,8 @@ void InterfaceKinetics::convertExchangeCurrentDensityFormulation(doublereal* con
                 // formulation format
                 double tmp = exp(m_beta[i] * m_deltaG0[irxn]
                                  / thermo(reactionPhaseIndex()).RT());
-                tmp *= Faraday * pow(m_ProdStanConcReac[irxn],m_beta[i]);
+                tmp *= Faraday * pow(m_ProdStanConcReac[irxn],m_beta[i])
+                        * pow(m_ProdStanConcReac[irxn],-m_beta[i]);
                 kfwd[irxn] *= tmp;
             }
         }
@@ -601,6 +606,7 @@ bool InterfaceKinetics::addReaction(shared_ptr<Reaction> r_base)
     m_deltaG0.push_back(0.0);
     m_deltaG.push_back(0.0);
     m_ProdStanConcReac.push_back(0.0);
+    m_ProdStanConcRevProd.push_back(0.0);
 
     return true;
 }
