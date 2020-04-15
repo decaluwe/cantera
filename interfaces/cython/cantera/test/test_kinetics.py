@@ -1227,13 +1227,13 @@ class TestButlerVolmer(utilities.CanteraTest):
         tpb = ct.Interface(infile, 'tpb', [gas,Pt,Naf])
         phases = {gas, Pt, Naf, tpb}
 
-        TP1 = 300, ct.one_atm
+        TP1 = 1073.15, ct.one_atm
         for ph in phases:
             ph.TP = TP1
 
         k1 = tpb.forward_rate_constants[0]
 
-        TP2 = 300., 10*ct.one_atm
+        TP2 = 1073.15, 10*ct.one_atm
         for ph in phases:
             ph.TP = TP2
         

@@ -571,12 +571,14 @@ protected:
      */
     vector_fp m_deltaG;
 
-    //! Vector of the products of the standard concentrations of the reactants
-    /*!
-     *   Units vary wrt what the units of the standard concentrations are
+    /*! Vector of the products of the standard concentrations of the reactants  
+     *   and products.
+     * 
+     *   Units vary with the units of the standard concentrations.
      *   Length = number of reactions.
      */
     vector_fp m_ProdStanConcReac;
+    vector_fp m_ProdStanConcRevProd;
 
     bool m_ROP_ok;
 

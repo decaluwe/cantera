@@ -9,7 +9,7 @@ phases:
   - gri30.yaml/species: [H2, H2O]
   transport: mixture-averaged
   state:
-    T: 300.
+    T: 1073.15
     P: 1.01325e+05
     X: {H2: 0.95, H2O: 0.05}
 - name: metal
@@ -17,17 +17,17 @@ phases:
   elements: [E]
   species: [electron]
   state:
-    T: 300.
+    T: 1073.15
     X: {electron: 1.0}
   density: 9.0 kg/m^3
 - name: electrolyte
   thermo: ideal-condensed
-  elements: [H, E]
-  species: [H(elyte), Vac(elyte)]
+  elements: [O, E]
+  species: [Ox(elyte), Vac(elyte)]
   state:
-    T: 300.
+    T: 1073.15
     P: 1.01325e+05
-    X: {H(elyte): 9.9999e-1, Vac(elyte): 1e-5}
+    X: {Ox(elyte): 9.9999e-1, Vac(elyte): 1e-5}
 - name: tpb
   thermo: edge
   elements: [H]
@@ -35,7 +35,7 @@ phases:
   kinetics: edge
   reactions: [tpb-reactions]
   state:
-    T: 300.
+    T: 1073.15
     coverages: {(tpb): 1.0}
   site-density: 2.7e-9
 
@@ -52,18 +52,20 @@ species:
     h0: 0.0 kJ/mol
   equation-of-state:
     model: constant-volume
-    molar-volume: 88.063 cm^3/mol
+    molar-volume: 58.17 cm^3/mol  # Set equal to average molar density.       
+                                  # Not accurate.
   note: A bulk electrolyte vacancy
-- name: H(elyte)
-  composition: {H: 1, E: -1}
+- name: Ox(elyte)
+  composition: {O: 1, E: 2}
   thermo:
     model: constant-cp
-    h0: -50.0 kJ/mol
-    s0: 0.0 J/K/mol
+    h0: -170.0 kJ/mol
+    s0: 50.0 J/K/mol
   equation-of-state:
     model: constant-volume
-    molar-volume: 88.063 cm^3/mol
-  note: A bulk electrolyte proton
+    molar-volume: 58.17 cm^3/mol  # Set equal to average molar density. 
+                                  # Not accurate.
+  note: A bulk electrolyte oxide ion
 - name: (tpb)
   composition: {}
   thermo:
@@ -74,7 +76,7 @@ species:
 # transferred to the metal, while the oxygen reacts with H2 in the gas
 # phase to creata a gas phase H2O molecule.
 tpb-reactions:
-- equation: H2 + 2 Vac(elyte) <=> 2 H(elyte) + 2 electron 
+- equation: H2 + Ox(elyte) <=> Vac(elyte) + H2O + 2 electron 
   id: edge-f1
   rate-constant: {A: 2.0e+10, b: 0.0, Ea: 0.0 kJ/mol}
   exchange-current-density-formulation: true
