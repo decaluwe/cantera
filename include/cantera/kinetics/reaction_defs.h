@@ -86,13 +86,12 @@ const int BUTLERVOLMER_NOACTIVITYCOEFFS_RXN = 25;
 //!  formulation. Note the B-V equations can be derived from the forward
 //!  and reverse rate constants for a single step reaction. However, there
 //!  are some advantages to using the formulation directly.
-//!  @deprecated To be removed after Cantera 2.5.
 const int BUTLERVOLMER_RXN = 26;
 
 //!  This is a surface reaction that is formulated using the affinity
 //!  representation, common in the geochemistry community.
-//!  This is generally a global non-mass action reaction with an additional functional
-//!  form dependence on delta G of reaction.
+//!  This is generally a global non-mass action reaction with an additional 
+//!  functional form dependence on delta G of reaction.
 //!  @deprecated To be removed after Cantera 2.5.
 const int SURFACEAFFINITY_RXN = 27;
 

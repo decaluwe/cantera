@@ -873,7 +873,7 @@ void setupElectrochemicalReaction(ElectrochemicalReaction& R,
 {
     // Fix reaction_type for some specialized reaction types
     std::string type = toLowerCopy(rxn_node["type"]);
-    if (type == "butlervolmer") {
+    if (type == "butler-volmer") {
         R.reaction_type = BUTLERVOLMER_RXN;
     } else if (type == "butlervolmer_noactivitycoeffs") {
         R.reaction_type = BUTLERVOLMER_NOACTIVITYCOEFFS_RXN;
@@ -980,7 +980,7 @@ void setupElectrochemicalReaction(ElectrochemicalReaction& R,
     // Fix reaction_type for some specialized reaction types
     
     std::string type = node["type"].asString();
-    if (type == "butlervolmer") {
+    if (type == "butler-volmer") {
         R.reaction_type = BUTLERVOLMER_RXN;
     } else if (type == "butlervolmer_noactivitycoeffs") {
         R.reaction_type = BUTLERVOLMER_NOACTIVITYCOEFFS_RXN;
@@ -1091,7 +1091,7 @@ shared_ptr<Reaction> newReaction(const XML_Node& rxn_node)
         return R;
     } else if (type == "electrochemical" ||
                type == "butlervolmer_noactivitycoeffs" ||
-               type == "butlervolmer" ||
+               type == "butler-volmer" ||
                type == "surfaceaffinity" ||
                type == "marcus") {
         auto R = make_shared<ElectrochemicalReaction>();

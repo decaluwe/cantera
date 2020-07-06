@@ -349,10 +349,13 @@ void InterfaceKinetics::updateROP()
     for (size_t i = 0; i < m_beta.size(); i++) {
         // Calculate i_o, including any concentration-dependent terms:
         // _updateExchangeCurrentDensity(m_rfn.data());
-        // Update overpotentials:
+
+        // Update electrochemical potentials. This is equal to the 
+        //  overpotential, divided by the Farday constant, for each reaction:
         vector_fp echemPotentials(nReactions(), 0.0);
         getDeltaElectrochemPotentials(&echemPotentials[0]);
 
+        // Reciprocal of RT:
         double rrt = 1.0 / thermo(reactionPhaseIndex()).RT();
         // Calculate the BV-type form directly, if specified:
         if (m_ctrxn_BVform[i] > 0) {
@@ -582,7 +585,6 @@ bool InterfaceKinetics::addReaction(shared_ptr<Reaction> r_base)
             //   Specify alternative forms of the electrochemical reaction
             if (r.reaction_type == BUTLERVOLMER_RXN) {
                 m_ctrxn_BVform.push_back(1);
-                m_ctrxn_overpotentials.push_back(0);
             } else if (r.reaction_type == BUTLERVOLMER_NOACTIVITYCOEFFS_RXN) {
                 m_ctrxn_BVform.push_back(2);
             } else if (r.reaction_type == MARCUS_RXN) {

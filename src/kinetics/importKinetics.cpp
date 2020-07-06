@@ -288,7 +288,7 @@ bool checkElectrochemReaction(const XML_Node& p, Kinetics& kin, const XML_Node& 
     std::string type = toLowerCopy(r["type"]);
     if (!r.child("rateCoeff").hasChild("electrochem")) {
         if ((type != "butlervolmer_noactivitycoeffs" &&
-             type != "butlervolmer" &&
+             type != "butler-volmer" &&
              type != "surfaceaffinity" &&
              type != "marcus") &&
              echemical) {
