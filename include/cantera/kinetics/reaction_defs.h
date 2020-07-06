@@ -96,6 +96,11 @@ const int BUTLERVOLMER_RXN = 26;
 //!  @deprecated To be removed after Cantera 2.5.
 const int SURFACEAFFINITY_RXN = 27;
 
+//!  This is a surface reaction that is formulated using the Marcus theory
+//!  formulation, similar to the Butler-Volmer form, but with different 
+//!  overpotential dependence and a few other differences
+const int MARCUS_RXN = 28;
+
 /**
  * A reaction occurring at a one-dimensional interface between two surface phases.
  *  NOTE: This is a bit ambiguous, and will be taken out in the future

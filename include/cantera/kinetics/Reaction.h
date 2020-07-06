@@ -255,8 +255,17 @@ public:
      */
     doublereal film_resistivity;
 
-    //! Forward value of the apparent Electrochemical transfer coefficient
+    //! Forward value of the apparent electrochemical symmetry parameter
     doublereal beta;
+
+    //! Forward value of the forward electrochemical transfer coefficient
+    doublereal alpha_fwd;
+
+    //! Forward value of the reverse electrochemical transfer coefficient
+    doublereal alpha_rev;
+
+    //! Lambda: reorganization energy of the transition state:
+    doublereal lambda;
 
     bool exchange_current_density_formulation;
 };

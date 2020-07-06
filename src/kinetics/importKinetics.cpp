@@ -289,7 +289,8 @@ bool checkElectrochemReaction(const XML_Node& p, Kinetics& kin, const XML_Node& 
     if (!r.child("rateCoeff").hasChild("electrochem")) {
         if ((type != "butlervolmer_noactivitycoeffs" &&
              type != "butlervolmer" &&
-             type != "surfaceaffinity") &&
+             type != "surfaceaffinity" &&
+             type != "marcus") &&
              echemical) {
             XML_Node& f = r.child("rateCoeff").addChild("electrochem","");
             f.addAttribute("beta",0.5);

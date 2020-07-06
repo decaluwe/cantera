@@ -506,12 +506,42 @@ protected:
      */
     ImplicitSurfChem* m_integrator;
 
+    //! Electrochemical symmetry parameter for the forward direction
+    /*!
+    *   Electrochemical symmetry parameter for all reactions that have
+    *   transfer reactions the reaction is given by m_ctrxn[i]. Assume 
+    *   elementary charge transfer, where beta_rev = 1 - beta_fwd
+    */
+    vector_fp m_beta;
+
     //! Electrochemical transfer coefficient for the forward direction
     /*!
-     *   Electrochemical transfer coefficient for all reactions that have
-     *   transfer reactions the reaction is given by m_ctrxn[i]
+    *   Electrochemical transfer coefficient parameter for the forward 
+    *   direction. The reaction is given by m_ctrxn[i]. Do not necessarily 
+    *   assume elementary charge transfer; 
+    *   m_alpha_fwd + m_alpha_rev = 1 is not enforced.
+    */
+    vector_fp m_alpha_fwd;
+
+    //! Electrochemical transfer coefficient for the reverse direction
+    /*!
+    *   Electrochemical transfer coefficient parameter for the forward 
+    *   direction. The reaction is given by m_ctrxn[i]. Do not necessarily 
+    *   assume elementary charge transfer; 
+    *   m_alpha_fwd + m_alpha_rev = 1 is not enforced, unless m_alpha_fwd is 
+    *   specified and m_alpha_rev is not.
+    * 
+    *   The user can specify m_beta, OR one/both of m_alpha_fwd and m_alpha_rev.
+    *   Specifying m_beta and either m_alpha value (fwd or rev) is not allowed.
+    */
+    vector_fp m_alpha_rev;
+
+    //! Electrochemical reorganization energy for electron transfer reaction.
+    /*!
+     *   Energy required to reorganize the molecular complex of the reactants 
+     *   before transition state formation (J/kmol e-)
      */
-    vector_fp m_beta;
+    vector_fp m_lambda;
 
     //! Vector of reaction indexes specifying the id of the charge transfer
     //! reactions in the mechanism
@@ -528,15 +558,28 @@ protected:
     /*!
      *     Length is equal to the number of reactions with charge transfer coefficients, m_ctrxn[]
      *
-     *    m_ctrxn_BVform[i] = 0;  This means that the irxn reaction is calculated via the standard forward
-     *                            and reverse reaction rates
-     *    m_ctrxn_BVform[i] = 1;  This means that the irxn reaction is calculated via the BV format
-     *                            directly.
-     *    m_ctrxn_BVform[i] = 2;  this means that the irxn reaction is calculated via the BV format
-     *                            directly, using concentrations instead of activity concentrations.
-     * @deprecated To be removed after Cantera 2.5.
+     *    m_ctrxn_BVform[i] = 0;  This means that the irxn reaction is 
+     *       calculated via the standard forward and reverse reaction rates
+     *    m_ctrxn_BVform[i] = 1;  This means that the irxn reaction is 
+     *       calculated via the BV format directly.
+     *    m_ctrxn_BVform[i] = 2;  This means that the irxn reaction is 
+     *       calculated via the BV format directly, using concentrations 
+     *       instead of activity concentrations.
+     *    m_ctrxn_BVform[i] = 3;   This means that the irxn reaction is 
+     *       calculated via the BV form directly, using marcus theory to 
+     *       calculate an overpotential-dependent beta.
      */
     std::vector<size_t> m_ctrxn_BVform;
+
+    //! Vector of overpotential values for all charge transfer reactions. (V)
+    /*!
+     *   Length is equal to the number of reactions with charge transfer 
+     *       
+     *   For any given set of states, the overpotential is equal to the net 
+     *      electrochemical potential of the reaction, found by calling 
+     *       getDeltaElectrochemPotentials
+     */ 
+     vector_fp m_ctrxn_overpotentials;
 
     //! Vector of booleans indicating whether the charge transfer reaction rate constant
     //! is described by an exchange current density rate constant expression

@@ -270,6 +270,8 @@ InterfaceReaction::InterfaceReaction(const Composition& reactants_,
 ElectrochemicalReaction::ElectrochemicalReaction()
     : film_resistivity(0.0)
     , beta(0.5)
+    , alpha_fwd(0.5)
+    , alpha_rev(0.5)
     , exchange_current_density_formulation(false)
 {
 }
@@ -280,6 +282,8 @@ ElectrochemicalReaction::ElectrochemicalReaction(const Composition& reactants_,
     : InterfaceReaction(reactants_, products_, rate_)
     , film_resistivity(0.0)
     , beta(0.5)
+    , alpha_fwd(0.5)
+    , alpha_rev(0.5)
     , exchange_current_density_formulation(false)
 {
 }
@@ -871,8 +875,6 @@ void setupElectrochemicalReaction(ElectrochemicalReaction& R,
     std::string type = toLowerCopy(rxn_node["type"]);
     if (type == "butlervolmer") {
         R.reaction_type = BUTLERVOLMER_RXN;
-        warn_deprecated("reaction type 'ButlerVolmer'",
-            "To be removed after Cantera 2.5.");
     } else if (type == "butlervolmer_noactivitycoeffs") {
         R.reaction_type = BUTLERVOLMER_NOACTIVITYCOEFFS_RXN;
         warn_deprecated("reaction type 'butlervolmer_noactivitycoeffs'",
@@ -885,7 +887,9 @@ void setupElectrochemicalReaction(ElectrochemicalReaction& R,
         R.reaction_type = GLOBAL_RXN;
         warn_deprecated("reaction type 'global'",
             "To be removed after Cantera 2.5.");
-    }
+    } else if (type == "marcus") {
+        R.reaction_type = MARCUS_RXN;
+    } 
 
     XML_Node& rc = rxn_node.child("rateCoeff");
     std::string rc_type = toLowerCopy(rc["type"]);
@@ -912,10 +916,11 @@ void setupElectrochemicalReaction(ElectrochemicalReaction& R,
 
     // For Butler Volmer reactions, install the orders for the exchange current
     if (R.reaction_type == BUTLERVOLMER_NOACTIVITYCOEFFS_RXN ||
-        R.reaction_type == BUTLERVOLMER_RXN) {
+        R.reaction_type == BUTLERVOLMER_RXN ||
+        R.reaction_type == MARCUS_RXN) {
         if (!R.reversible) {
             throw CanteraError("setupElectrochemicalReaction",
-                "A Butler-Volmer reaction must be reversible");
+                "A Butler-Volmer-style reaction must be reversible");
         }
 
         R.orders.clear();
@@ -972,10 +977,46 @@ void setupElectrochemicalReaction(ElectrochemicalReaction& R,
 void setupElectrochemicalReaction(ElectrochemicalReaction& R,
                                   const AnyMap& node, const Kinetics& kin)
 {
+    // Fix reaction_type for some specialized reaction types
+    
+    std::string type = node["type"].asString();
+    if (type == "butlervolmer") {
+        R.reaction_type = BUTLERVOLMER_RXN;
+    } else if (type == "butlervolmer_noactivitycoeffs") {
+        R.reaction_type = BUTLERVOLMER_NOACTIVITYCOEFFS_RXN;
+        warn_deprecated("reaction type 'butlervolmer_noactivitycoeffs'",
+            "To be removed after Cantera 2.5.");
+    } else if (type == "surfaceaffinity") {
+        R.reaction_type = SURFACEAFFINITY_RXN;
+        warn_deprecated("reaction type 'surfaceaffinity'",
+            "To be removed after Cantera 2.5.");
+    } else if (type == "global") {
+        R.reaction_type = GLOBAL_RXN;
+        warn_deprecated("reaction type 'global'",
+            "To be removed after Cantera 2.5.");
+    } else if (type == "marcus") {
+        R.reaction_type = MARCUS_RXN;
+    } 
+
+
     setupInterfaceReaction(R, node, kin);
     R.beta = node.getDouble("beta", 0.5);
     R.exchange_current_density_formulation = node.getBool(
         "exchange-current-density-formulation", false);
+    if (node.hasKey("transfer-coefficients")) {
+        auto& coeffs =  node["transfer-coefficients"].as<AnyMap>();
+        if (coeffs.hasKey("beta")) {
+            R.beta = coeffs.getDouble("beta", 0.5);
+        } else if (coeffs.hasKey("alpha_fwd")) {
+            R.alpha_fwd =  coeffs.getDouble("alpha_fwd", 0.5);
+            if (coeffs.hasKey("alpha_rev")) {
+                R.alpha_rev = coeffs.getDouble("alpha_rev", 0.5);
+            } else {
+                R.alpha_rev = 1.0 - R.alpha_fwd;
+            }
+        }
+        R.lambda = coeffs.getDouble("lambda", BigNumber);
+    }
 }
 
 bool isElectrochemicalReaction(Reaction& R, const Kinetics& kin)
@@ -1051,7 +1092,8 @@ shared_ptr<Reaction> newReaction(const XML_Node& rxn_node)
     } else if (type == "electrochemical" ||
                type == "butlervolmer_noactivitycoeffs" ||
                type == "butlervolmer" ||
-               type == "surfaceaffinity") {
+               type == "surfaceaffinity" ||
+               type == "marcus") {
         auto R = make_shared<ElectrochemicalReaction>();
         setupElectrochemicalReaction(*R, rxn_node);
         return R;
