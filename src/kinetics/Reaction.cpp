@@ -887,8 +887,6 @@ void setupElectrochemicalReaction(ElectrochemicalReaction& R,
         R.reaction_type = GLOBAL_RXN;
         warn_deprecated("reaction type 'global'",
             "To be removed after Cantera 2.5.");
-    } else if (type == "marcus") {
-        R.reaction_type = MARCUS_RXN;
     } 
 
     XML_Node& rc = rxn_node.child("rateCoeff");
@@ -914,7 +912,7 @@ void setupElectrochemicalReaction(ElectrochemicalReaction& R,
     getOptionalFloat(rxn_node, "filmResistivity", R.film_resistivity);
     setupInterfaceReaction(R, rxn_node);
 
-    // For Butler Volmer reactions, install the orders for the exchange current
+    // For Butler-Volmer-type reactions, install the exchange current orders:
     if (R.reaction_type == BUTLERVOLMER_NOACTIVITYCOEFFS_RXN ||
         R.reaction_type == BUTLERVOLMER_RXN ||
         R.reaction_type == MARCUS_RXN) {
@@ -996,7 +994,9 @@ void setupElectrochemicalReaction(ElectrochemicalReaction& R,
             "To be removed after Cantera 2.5.");
     } else if (type == "marcus") {
         R.reaction_type = MARCUS_RXN;
-    } 
+    } else if (type == "marcus-hush-chidsey"){
+        R.reaction_type = MARCUS_HUSH_CHIDSEY_RXN;
+    }
 
 
     setupInterfaceReaction(R, node, kin);
@@ -1093,7 +1093,8 @@ shared_ptr<Reaction> newReaction(const XML_Node& rxn_node)
                type == "butlervolmer_noactivitycoeffs" ||
                type == "butler-volmer" ||
                type == "surfaceaffinity" ||
-               type == "marcus") {
+               type == "marcus" ||
+               type == "marcus-hush-chidsey") {
         auto R = make_shared<ElectrochemicalReaction>();
         setupElectrochemicalReaction(*R, rxn_node);
         return R;

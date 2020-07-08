@@ -568,6 +568,8 @@ protected:
      *    m_ctrxn_BVform[i] = 3;   This means that the irxn reaction is 
      *       calculated via the BV form directly, using marcus theory to 
      *       calculate an overpotential-dependent beta.
+     *    m_ctrxn_BVform[i] = -1;   This means that the irxn reaction is *
+     *       calculated via the Marcus-Hush-Chidsey kinetics formulation.  
      */
     std::vector<size_t> m_ctrxn_BVform;
 

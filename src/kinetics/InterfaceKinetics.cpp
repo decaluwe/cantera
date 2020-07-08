@@ -347,6 +347,7 @@ void InterfaceKinetics::updateROP()
     // Loop over electrochemical reactions, and if BV-type-form is specified, 
     //  overwrite forward and reverse rop values:
     for (size_t i = 0; i < m_beta.size(); i++) {
+        size_t irxn = m_ctrxn[i];
         // Calculate i_o, including any concentration-dependent terms:
         // _updateExchangeCurrentDensity(m_rfn.data());
 
@@ -358,8 +359,7 @@ void InterfaceKinetics::updateROP()
         // Reciprocal of RT:
         double rrt = 1.0 / thermo(reactionPhaseIndex()).RT();
         // Calculate the BV-type form directly, if specified:
-        if (m_ctrxn_BVform[i] > 0) {
-            size_t irxn = m_ctrxn[i];
+        if (m_ctrxn_BVform[i] > 0 &*& m_ctrxn_BVform[i] < 4) {
             double i_o = m_rfn[irxn];
             double beta = m_beta[i];
             if (m_ctrxn_BVform[i] == 3){ // marcus theory
@@ -368,7 +368,17 @@ void InterfaceKinetics::updateROP()
             // Calculate rop_f and rop_r:
             m_ropf[irxn] = i_o*exp(-beta*echemPotentials[irxn]*rrt)/Faraday;
             m_ropr[irxn] = i_o*exp((1-beta)*echemPotentials[irxn]*rrt)/Faraday;
-        }
+        } else if (m_ctrxn_BVform[i] == 4) {
+            double i_o = m_rfn[irxn];
+            double eta_term = echemPotentials[irxn]*rrt;
+            double lambda_term = m_lambda[i]*rrt;
+            double erfc_term = erfc((lambda_term - sqrt(1.0 + sqrt(lambda_term)
+                            + eta_term*eta_term))/2/sqrt(lambda_term));
+            m_ropf[irxn] = i_o*sqrt(Pi*lambda_term)
+                           * erfc_term/(1. + exp(eta_term))/Faraday;
+            m_ropr[irxn] = i_o*sqrt(Pi*lambda_term)
+                           * erfc_term/(1. + exp(-eta_term))/Faraday;
+        } 
     }
 
     for (size_t j = 0; j != nReactions(); ++j) {
@@ -581,7 +591,8 @@ bool InterfaceKinetics::addReaction(shared_ptr<Reaction> r_base)
             r.reaction_type == BUTLERVOLMER_RXN ||
             r.reaction_type == SURFACEAFFINITY_RXN ||
             r.reaction_type == MARCUS_RXN ||
-            r.reaction_type == GLOBAL_RXN) {
+            r.reaction_type == GLOBAL_RXN ||
+            r.reaction_type == MARCUS_HUSH_CHIDSEY_RXN) {
             //   Specify alternative forms of the electrochemical reaction
             if (r.reaction_type == BUTLERVOLMER_RXN) {
                 m_ctrxn_BVform.push_back(1);
@@ -590,7 +601,11 @@ bool InterfaceKinetics::addReaction(shared_ptr<Reaction> r_base)
             } else if (r.reaction_type == MARCUS_RXN) {
                 m_ctrxn_BVform.push_back(3);
                 m_lambda.push_back(re->lambda);
-            } else {
+            } else if (r.reaction_type == MARCUS_HUSH_CHIDSEY_RXN) {
+                m_ctrxn_BVform.push_back(4);
+                m_lambda.push_back(re->lambda);
+            }
+            else {
                 // set the default to be the normal forward / reverse calculation method
                 m_ctrxn_BVform.push_back(0);
             }

@@ -97,8 +97,15 @@ const int SURFACEAFFINITY_RXN = 27;
 
 //!  This is a surface reaction that is formulated using the Marcus theory
 //!  formulation, similar to the Butler-Volmer form, but with different 
-//!  overpotential dependence and a few other differences
+//!  overpotential dependence and a dependence on the energy required to 
+//!  reorganize the solvent, prior to charge-transfer.
 const int MARCUS_RXN = 28;
+
+//!  This is a surface reaction that is formulated using Marcus-Hush-Chidsey 
+//!  formulation, which incorporates the energy required to reorganizae the 
+//!  solvent molecules, prior to charge-transfer, and also accounts for the 
+//!  Fermi-Dirac distribution of electron states in the metal phase.
+const int MARCUS_HUSH_CHIDSEY_RXN = 29;
 
 /**
  * A reaction occurring at a one-dimensional interface between two surface phases.
