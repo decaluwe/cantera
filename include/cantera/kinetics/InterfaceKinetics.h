@@ -547,7 +547,7 @@ protected:
     //! reactions in the mechanism
     /*!
      *  Vector of reaction indices which involve charge transfers. This provides
-     *  an index into the m_beta and m_ctrxn_BVform array.
+     *  an index into the m_beta and m_ctrxn_form array.
      *
      *        irxn = m_ctrxn[i]
      */
@@ -558,20 +558,20 @@ protected:
     /*!
      *     Length is equal to the number of reactions with charge transfer coefficients, m_ctrxn[]
      *
-     *    m_ctrxn_BVform[i] = 0;  This means that the irxn reaction is 
+     *    m_ctrxn_form[i] = 0;  This means that the irxn reaction is 
      *       calculated via the standard forward and reverse reaction rates
-     *    m_ctrxn_BVform[i] = 1;  This means that the irxn reaction is 
+     *    m_ctrxn_form[i] = 1;  This means that the irxn reaction is 
      *       calculated via the BV format directly.
-     *    m_ctrxn_BVform[i] = 2;  This means that the irxn reaction is 
+     *    m_ctrxn_form[i] = 2;  This means that the irxn reaction is 
      *       calculated via the BV format directly, using concentrations 
      *       instead of activity concentrations.
-     *    m_ctrxn_BVform[i] = 3;   This means that the irxn reaction is 
+     *    m_ctrxn_form[i] = 3;   This means that the irxn reaction is 
      *       calculated via the BV form directly, using marcus theory to 
      *       calculate an overpotential-dependent beta.
-     *    m_ctrxn_BVform[i] = -1;   This means that the irxn reaction is *
+     *    m_ctrxn_form[i] = -1;   This means that the irxn reaction is *
      *       calculated via the Marcus-Hush-Chidsey kinetics formulation.  
      */
-    std::vector<size_t> m_ctrxn_BVform;
+    std::vector<size_t> m_ctrxn_form;
 
     //! Vector of overpotential values for all charge transfer reactions. (V)
     /*!

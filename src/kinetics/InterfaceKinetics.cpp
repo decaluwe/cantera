@@ -238,7 +238,7 @@ void InterfaceKinetics::applyVoltageKfwdCorrection(doublereal* const kf)
 
         // If we calculate the BV form directly, we don't add the voltage
         // correction to the forward reaction rate constants.
-        if (m_ctrxn_BVform[i] == 0) {
+        if (m_ctrxn_form[i] == 0) {
             double eamod = m_beta[i] * deltaElectricEnergy_[irxn];
             if (eamod != 0.0) {
                 kf[irxn] *= exp(-eamod/thermo(reactionPhaseIndex()).RT());
@@ -265,21 +265,21 @@ void InterfaceKinetics::convertExchangeCurrentDensityFormulation(doublereal* con
             //
             // We need to have the straight chemical reaction rate constant to
             // come out of this calculation.
-            if (m_ctrxn_BVform[i] == 0) {
+            if (m_ctrxn_form[i] == 0) {
                 //  Calculate the term and modify the forward reaction
                 double tmp = exp(- m_beta[i] * m_deltaG0[irxn]
                                  / thermo(reactionPhaseIndex()).RT());
                 tmp *= 1.0 / m_ProdStanConcReac[irxn] / Faraday;
                 kfwd[irxn] *= tmp;
             }
-            //  If BVform is nonzero we don't need to do anything.
+            //  If form is nonzero we don't need to do anything.
         } else {
             // kfwd[] is the chemical reaction rate constant
             //
             // If we are to calculate the BV form directly, then we will do the
             // reverse. We will calculate the exchange current density
             // formulation here and substitute it.
-            if (m_ctrxn_BVform[i] != 0) {
+            if (m_ctrxn_form[i] != 0) {
                 // Calculate the term and modify the forward reaction rate
                 // constant so that it's in the exchange current density
                 // formulation format
@@ -359,16 +359,16 @@ void InterfaceKinetics::updateROP()
         // Reciprocal of RT:
         double rrt = 1.0 / thermo(reactionPhaseIndex()).RT();
         // Calculate the BV-type form directly, if specified:
-        if (m_ctrxn_BVform[i] > 0 &*& m_ctrxn_BVform[i] < 4) {
+        if (m_ctrxn_form[i] > 0 &*& m_ctrxn_form[i] < 4) {
             double i_o = m_rfn[irxn];
             double beta = m_beta[i];
-            if (m_ctrxn_BVform[i] == 3){ // marcus theory
+            if (m_ctrxn_form[i] == 3){ // marcus theory
                 beta += echemPotentials[irxn]/4/m_lambda[i];
             } 
             // Calculate rop_f and rop_r:
             m_ropf[irxn] = i_o*exp(-beta*echemPotentials[irxn]*rrt)/Faraday;
             m_ropr[irxn] = i_o*exp((1-beta)*echemPotentials[irxn]*rrt)/Faraday;
-        } else if (m_ctrxn_BVform[i] == 4) {
+        } else if (m_ctrxn_form[i] == 4) {
             double i_o = m_rfn[irxn];
             double eta_term = echemPotentials[irxn]*rrt;
             double lambda_term = m_lambda[i]*rrt;
@@ -595,19 +595,19 @@ bool InterfaceKinetics::addReaction(shared_ptr<Reaction> r_base)
             r.reaction_type == MARCUS_HUSH_CHIDSEY_RXN) {
             //   Specify alternative forms of the electrochemical reaction
             if (r.reaction_type == BUTLERVOLMER_RXN) {
-                m_ctrxn_BVform.push_back(1);
+                m_ctrxn_form.push_back(1);
             } else if (r.reaction_type == BUTLERVOLMER_NOACTIVITYCOEFFS_RXN) {
-                m_ctrxn_BVform.push_back(2);
+                m_ctrxn_form.push_back(2);
             } else if (r.reaction_type == MARCUS_RXN) {
-                m_ctrxn_BVform.push_back(3);
+                m_ctrxn_form.push_back(3);
                 m_lambda.push_back(re->lambda);
             } else if (r.reaction_type == MARCUS_HUSH_CHIDSEY_RXN) {
-                m_ctrxn_BVform.push_back(4);
+                m_ctrxn_form.push_back(4);
                 m_lambda.push_back(re->lambda);
             }
             else {
                 // set the default to be the normal forward / reverse calculation method
-                m_ctrxn_BVform.push_back(0);
+                m_ctrxn_form.push_back(0);
             }
             if (!r.orders.empty()) {
                 vector_fp orders(nTotalSpecies(), 0.0);
@@ -616,7 +616,7 @@ bool InterfaceKinetics::addReaction(shared_ptr<Reaction> r_base)
                 }
             }
         } else {
-            m_ctrxn_BVform.push_back(0);
+            m_ctrxn_form.push_back(0);
             if (re->film_resistivity > 0.0) {
                 throw CanteraError("InterfaceKinetics::addReaction",
                                    "film resistivity set for elementary reaction");
