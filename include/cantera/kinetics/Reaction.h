@@ -275,7 +275,7 @@ public:
      *   Units vary wrt what the units of the reference concentrations are
      *   Length = number of reactions.
      */
-    double InvRefConcsProd;
+    double ctrxn_concScaleFactor;
     
 };
 

@@ -1018,7 +1018,7 @@ void setupElectrochemicalReaction(ElectrochemicalReaction& R,
     }
 
     // Load reference states for dependence on species availability:
-    R.InvRefConcsProd = 1.0;
+    R.ctrxn_concScaleFactor = 1.0;
     if (node.hasKey("state-dependence")) {
         auto& state_dep = node["state-dependence"].as<AnyMap>();
         if (state_dep.hasKey("orders")) {
@@ -1041,7 +1041,7 @@ void setupElectrochemicalReaction(ElectrochemicalReaction& R,
             auto& concentrations = state_dep["reference-state"].as<AnyMap>();
 
             for (const auto& sp : concentrations) {
-                R.InvRefConcsProd *= pow(sp.second.asDouble(), -R.orders[sp.first]);
+                R.ctrxn_concScaleFactor *= pow(sp.second.asDouble(), -R.orders[sp.first]);
             }
         }
     }

@@ -551,7 +551,7 @@ protected:
      * 
      *  Length is equal to the number of charge transfer reactions.
      */
-    vector_fp m_InvRefConcsProd;
+    vector_fp m_ctrxn_concScaleFactor;
 
     //! Vector of reaction indexes specifying the id of the charge transfer
     //! reactions in the mechanism

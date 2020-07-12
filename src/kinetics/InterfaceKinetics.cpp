@@ -363,7 +363,7 @@ void InterfaceKinetics::updateROP()
         if (m_ctrxn_form[i] > 0 && m_ctrxn_form[i] < 4) {
             // Scale the concentration dependence by the refeence
             // concentrations:
-            m_ropf[irxn] *= m_InvRefConcsProd[i];
+            m_ropf[irxn] *= m_ctrxn_concScaleFactor[i];
             
             double beta = m_beta[i];
             if (m_ctrxn_form[i] == 3){ // marcus theory
@@ -375,7 +375,7 @@ void InterfaceKinetics::updateROP()
         } else if (m_ctrxn_form[i] == 4) {
             // Scale the concentration dependence by the refeence
             // concentrations:
-            double i_o = m_ropf[irxn] * m_InvRefConcsProd[i];
+            double i_o = m_ropf[irxn] * m_ctrxn_concScaleFactor[i];
             double eta_term = echemPotentials[irxn]*rrt;
             double lambda_term = m_lambda[i]*rrt;
             double erfc_term = erfc((lambda_term - sqrt(1.0 + sqrt(lambda_term)
@@ -585,7 +585,7 @@ bool InterfaceKinetics::addReaction(shared_ptr<Reaction> r_base)
         m_has_electrochem_rxns = true;
         m_beta.push_back(re->beta);
         m_ctrxn.push_back(i);
-        m_InvRefConcsProd.push_back(re->InvRefConcsProd);
+        m_ctrxn_concScaleFactor.push_back(re->ctrxn_concScaleFactor);
         if (re->exchange_current_density_formulation) {
             m_has_exchange_current_density_formulation = true;
             m_ctrxn_ecdf.push_back(1);
