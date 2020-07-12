@@ -347,29 +347,35 @@ void InterfaceKinetics::updateROP()
     // Loop over electrochemical reactions, and if BV-type-form is specified, 
     //  overwrite forward and reverse rop values:
     for (size_t i = 0; i < m_beta.size(); i++) {
+        // Get the reaction index, relative to the array of all interface 
+        // reactions:
         size_t irxn = m_ctrxn[i];
-        // Calculate i_o, including any concentration-dependent terms:
-        // _updateExchangeCurrentDensity(m_rfn.data());
 
         // Update electrochemical potentials. This is equal to the 
-        //  overpotential, divided by the Farday constant, for each reaction:
+        //  overpotential, multiplied by the elementary charge transfered and 
+        //  the Farday constant, for each reaction:
         vector_fp echemPotentials(nReactions(), 0.0);
         getDeltaElectrochemPotentials(&echemPotentials[0]);
 
         // Reciprocal of RT:
         double rrt = 1.0 / thermo(reactionPhaseIndex()).RT();
         // Calculate the BV-type form directly, if specified:
-        if (m_ctrxn_form[i] > 0 &*& m_ctrxn_form[i] < 4) {
-            double i_o = m_rfn[irxn];
+        if (m_ctrxn_form[i] > 0 && m_ctrxn_form[i] < 4) {
+            // Scale the concentration dependence by the refeence
+            // concentrations:
+            m_ropf[irxn] *= m_InvRefConcsProd[i];
+            
             double beta = m_beta[i];
             if (m_ctrxn_form[i] == 3){ // marcus theory
                 beta += echemPotentials[irxn]/4/m_lambda[i];
             } 
             // Calculate rop_f and rop_r:
-            m_ropf[irxn] = i_o*exp(-beta*echemPotentials[irxn]*rrt)/Faraday;
-            m_ropr[irxn] = i_o*exp((1-beta)*echemPotentials[irxn]*rrt)/Faraday;
+            m_ropf[irxn] *= exp(-beta*echemPotentials[irxn]*rrt)/Faraday;
+            m_ropr[irxn] = m_ropf[irxn]*exp(echemPotentials[irxn]*rrt);
         } else if (m_ctrxn_form[i] == 4) {
-            double i_o = m_rfn[irxn];
+            // Scale the concentration dependence by the refeence
+            // concentrations:
+            double i_o = m_ropf[irxn] * m_InvRefConcsProd[i];
             double eta_term = echemPotentials[irxn]*rrt;
             double lambda_term = m_lambda[i]*rrt;
             double erfc_term = erfc((lambda_term - sqrt(1.0 + sqrt(lambda_term)
@@ -579,6 +585,7 @@ bool InterfaceKinetics::addReaction(shared_ptr<Reaction> r_base)
         m_has_electrochem_rxns = true;
         m_beta.push_back(re->beta);
         m_ctrxn.push_back(i);
+        m_InvRefConcsProd.push_back(re->InvRefConcsProd);
         if (re->exchange_current_density_formulation) {
             m_has_exchange_current_density_formulation = true;
             m_ctrxn_ecdf.push_back(1);

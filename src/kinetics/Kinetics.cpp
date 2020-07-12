@@ -486,8 +486,12 @@ bool Kinetics::addReaction(shared_ptr<Reaction> r)
     // is not reversible, since computing the reverse rate from thermochemistry
     // only works for elementary reactions.
     if (r->reversible && !r->orders.empty()) {
-        throw InputFileError("Kinetics::addReaction", r->input,
-            "Reaction orders may only be given for irreversible reactions");
+        if (r->reaction_type != BUTLERVOLMER_RXN &&
+            r->reaction_type != MARCUS_RXN &&
+            r->reaction_type != MARCUS_HUSH_CHIDSEY_RXN) {
+                throw InputFileError("Kinetics::addReaction", r->input,
+                    "Reaction orders may only be given for irreversible", "reactions.");
+        }
     }
 
     // Check for undeclared species

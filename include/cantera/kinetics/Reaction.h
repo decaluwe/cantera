@@ -268,6 +268,15 @@ public:
     doublereal lambda;
 
     bool exchange_current_density_formulation;
+
+    //! Vector of the inverse products of the reference concentrations of the
+    //! reactants, raised to the species orders.
+    /*!
+     *   Units vary wrt what the units of the reference concentrations are
+     *   Length = number of reactions.
+     */
+    double InvRefConcsProd;
+    
 };
 
 //! Create a new Reaction object for the reaction defined in `rxn_node`

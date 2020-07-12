@@ -998,7 +998,6 @@ void setupElectrochemicalReaction(ElectrochemicalReaction& R,
         R.reaction_type = MARCUS_HUSH_CHIDSEY_RXN;
     }
 
-
     setupInterfaceReaction(R, node, kin);
     R.beta = node.getDouble("beta", 0.5);
     R.exchange_current_density_formulation = node.getBool(
@@ -1016,6 +1015,35 @@ void setupElectrochemicalReaction(ElectrochemicalReaction& R,
             }
         }
         R.lambda = coeffs.getDouble("lambda", BigNumber);
+    }
+
+    // Load reference states for dependence on species availability:
+    R.InvRefConcsProd = 1.0;
+    if (node.hasKey("state-dependence")) {
+        auto& state_dep = node["state-dependence"].as<AnyMap>();
+        if (state_dep.hasKey("orders")) {
+            // To be implemented: allow for non-stoichiometric orders.
+        } else {
+            R.orders.clear();
+            // Reaction orders based on species stoichiometric coefficients
+            R.allow_nonreactant_orders = true;
+            for (const auto& sp : R.reactants) {
+                R.orders[sp.first] += sp.second * (1.0 - R.beta);
+            }
+            for (const auto& sp : R.products) {
+                R.orders[sp.first] += sp.second * R.beta;
+            }
+        }
+        
+        if (state_dep.hasKey("reference-state")) {
+            // Store the inverse product of the reference state 
+            // "concentrations", raised to the species orders:            
+            auto& concentrations = state_dep["reference-state"].as<AnyMap>();
+
+            for (const auto& sp : concentrations) {
+                R.InvRefConcsProd *= pow(sp.second.asDouble(), -R.orders[sp.first]);
+            }
+        }
     }
 }
 

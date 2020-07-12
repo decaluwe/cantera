@@ -543,6 +543,16 @@ protected:
      */
     vector_fp m_lambda;
 
+    //! Vector of correct factors for charge-transfer state dependence.
+    /*!
+     *  Product of inverse reference concentrations raised to the species order.
+     *  Units depends on the units of the user-provided reference 
+     *  concentrations.
+     * 
+     *  Length is equal to the number of charge transfer reactions.
+     */
+    vector_fp m_InvRefConcsProd;
+
     //! Vector of reaction indexes specifying the id of the charge transfer
     //! reactions in the mechanism
     /*!
@@ -558,17 +568,17 @@ protected:
     /*!
      *     Length is equal to the number of reactions with charge transfer coefficients, m_ctrxn[]
      *
-     *    m_ctrxn_form[i] = 0;  This means that the irxn reaction is 
+     *    m_ctrxn_form[i] = 0;  This means that the irxn reaction is
      *       calculated via the standard forward and reverse reaction rates
-     *    m_ctrxn_form[i] = 1;  This means that the irxn reaction is 
+     *    m_ctrxn_form[i] = 1;  This means that the irxn reaction is
      *       calculated via the BV format directly.
-     *    m_ctrxn_form[i] = 2;  This means that the irxn reaction is 
+     *    m_ctrxn_form[i] = 2;  This means that the irxn reaction is
      *       calculated via the BV format directly, using concentrations 
      *       instead of activity concentrations.
-     *    m_ctrxn_form[i] = 3;   This means that the irxn reaction is 
+     *    m_ctrxn_form[i] = 3;   This means that the irxn reaction is
      *       calculated via the BV form directly, using marcus theory to 
      *       calculate an overpotential-dependent beta.
-     *    m_ctrxn_form[i] = -1;   This means that the irxn reaction is *
+     *    m_ctrxn_form[i] = -1;   This means that the irxn reaction is
      *       calculated via the Marcus-Hush-Chidsey kinetics formulation.  
      */
     std::vector<size_t> m_ctrxn_form;
@@ -583,8 +593,9 @@ protected:
      */ 
      vector_fp m_ctrxn_overpotentials;
 
-    //! Vector of booleans indicating whether the charge transfer reaction rate constant
-    //! is described by an exchange current density rate constant expression
+    //! Vector of booleans indicating whether the charge transfer reaction rate
+    //! constant is described by an exchange current density rate constant
+    //! expression.
     /*!
      *   Length is equal to the number of reactions with charge transfer coefficients, m_ctrxn[]
      *
