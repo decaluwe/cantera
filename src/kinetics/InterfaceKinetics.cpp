@@ -345,7 +345,7 @@ void InterfaceKinetics::updateROP()
     m_revProductStoich.multiply(m_actConc.data(), m_ropr.data());
 
     // Loop over electrochemical reactions, and if BV-type-form is specified, 
-    //  overwrite forward and reverse rop values:
+    //  overwrite m_ropf and m_ropr values:
     for (size_t i = 0; i < m_beta.size(); i++) {
         // Get the reaction index, relative to the array of all interface 
         // reactions:
@@ -372,18 +372,19 @@ void InterfaceKinetics::updateROP()
             // Calculate rop_f and rop_r:
             m_ropf[irxn] *= exp(-beta*echemPotentials[irxn]*rrt)/Faraday;
             m_ropr[irxn] = m_ropf[irxn]*exp(echemPotentials[irxn]*rrt);
+
         } else if (m_ctrxn_form[i] == 4) {
-            // Scale the concentration dependence by the refeence
+            // Scale the concentration dependence by the reference
             // concentrations:
             double i_o = m_ropf[irxn] * m_ctrxn_concScaleFactor[i];
-            double eta_term = echemPotentials[irxn]*rrt;
-            double lambda_term = m_lambda[i]*rrt;
-            double erfc_term = erfc((lambda_term - sqrt(1.0 + sqrt(lambda_term)
-                            + eta_term*eta_term))/2/sqrt(lambda_term));
-            m_ropf[irxn] = i_o*sqrt(Pi*lambda_term)
-                           * erfc_term/(1. + exp(eta_term))/Faraday;
-            m_ropr[irxn] = i_o*sqrt(Pi*lambda_term)
-                           * erfc_term/(1. + exp(-eta_term))/Faraday;
+            double eta_RT = echemPotentials[irxn]*rrt;
+            double lambda_RT = m_lambda[i]*rrt;
+            double erfc_term = erfc((lambda_RT - sqrt(1.0 + sqrt(lambda_RT)
+                            + eta_RT*eta_RT))/2/sqrt(lambda_RT));
+            m_ropf[irxn] = i_o*sqrt(Pi*lambda_RT)
+                           * erfc_term/(1. + exp(eta_RT))/Faraday;
+            m_ropr[irxn] = i_o*sqrt(Pi*lambda_RT)
+                           * erfc_term/(1. + exp(-eta_RT))/Faraday;
         } 
     }
 
